@@ -57,7 +57,7 @@ class Dot:
 
 if __name__ == '__main__':
     dot = Dot(2, 2)
-    dot.coords = 3, 4
+    dot.coords = 3, 3
     dot2 = Dot(3, 4)
     print(dot == dot2)
     dot3 = Dot(2, 4)
