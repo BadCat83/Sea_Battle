@@ -49,13 +49,10 @@ class Dot:
 
     @coords.setter
     def coords(self, coords):
-        try:
-            if all(map(self.check_coords, coords)):
-                self.x, self.y = (_ for _ in coords)
-            else:
-                raise IncorrectCoordinates(coords)
-        except IncorrectCoordinates:
-            print(f'Incorrect ccordinates {coords}')
+        if all(map(self.check_coords, coords)):
+            self.x, self.y = (_ for _ in coords)
+        else:
+            raise IncorrectCoordinates(coords)
 
     @staticmethod
     def print_help():
@@ -70,4 +67,3 @@ if __name__ == '__main__':
     dot3 = Dot(2, 4)
     dot3.state = 'ship'
     print(dot3.state, dot.state)
-

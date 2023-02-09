@@ -1,9 +1,6 @@
 class BoardOutException(Exception):
-    def __init__(self, coords):
-        self.message = coords
-
     def __str__(self):
-        return f'Specified coordinates {self.message} are incorrect'
+        return 'The ship with this coordinates will be placed out of the board'
 
 
 class IncorrectCoordinates(Exception):

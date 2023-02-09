@@ -1,4 +1,5 @@
 from dot import Dot
+from exceptions import BoardOutException
 
 
 class Ship:
@@ -37,10 +38,13 @@ class Ship:
     @dots.setter
     def dots(self, data):
         x, y, self.course = (_ for _ in data)
-        if self.course == 1:
-            self._dots = [Dot(x, y) for x in range(x, x + self.length)]
-        else:
-            self._dots = [Dot(x, y) for y in range(y, y + self.length)]
+        try:
+            if self.course == 1:
+                self._dots = [Dot(x, y) for x in range(x, x + self.length)]
+            else:
+                self._dots = [Dot(x, y) for y in range(y, y + self.length)]
+        except Exception:
+            raise BoardOutException
 
 
 class Boat(Ship):

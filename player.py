@@ -1,6 +1,5 @@
 from board import Board
-from dot import Dot
-from exceptions import IncorrectCoordinates, ShotError
+from exceptions import ShotError
 
 
 class Player:
@@ -35,15 +34,20 @@ class User(Player):
                 for every in self.own_board, self.opponent_board:
                     every.shot(x, y)
 
-            except (IncorrectCoordinates, ValueError) as e:
-                print(e)
-                Player().print_help_coordinates()
-                continue
             except ShotError as se:
                 print(se)
                 continue
+
+            except Exception as e:
+                print(e)
+                Player().print_help_coordinates()
+                continue
             else:
                 break
+
+    @staticmethod
+    def input_coords(msg):
+        return [int(val) for val in input(msg).split(',')]
 
     def place_ships(self):
         self.own_board.print_help()
@@ -51,10 +55,18 @@ class User(Player):
             try:
                 print(
                     "For every ship you need to enter starting position (x,y) and course 0 - vertical, 1 - horizontal")
-                x, y, course = [int(val) for val in input("Please, place the cruiser first: ").split(',')]
-                self.own_board.add_ship(ship_type='cruiser', x=x, y=y, course=course)
+                x, y, course = self.input_coords("Please, place the cruiser first: ")
+                self.own_board.add_ship('cruiser', x, y, course)
                 self.own_board.show()
-                break
+                for i, _ in enumerate(range(2), 1):
+                    x, y, course = self.input_coords(f"Please, place {i} destroyer: ")
+                    self.own_board.add_ship('destroyer', x, y, course)
+                    self.own_board.show()
+                for i, _ in enumerate(range(4), 1):
+                    x, y = self.input_coords(f"Please, place {i} boat: ")
+                    self.own_board.add_ship('boat', x, y)
+                    self.own_board.show()
+
             except Exception as e:
                 print(e)
 
