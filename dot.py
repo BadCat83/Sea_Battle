@@ -12,7 +12,7 @@ class Dot:
         else:
             raise IncorrectCoordinates((x, y))
 
-        self._state = {'empty': True, 'ship': False, 'forbidden': False, 'hit': False}
+        self._state = {'empty': True, 'ship': False, 'forbidden': False, 'hit': False, 'miss': False}
 
     def __eq__(self, other):
         if not isinstance(other, Dot):
@@ -49,10 +49,17 @@ class Dot:
 
     @coords.setter
     def coords(self, coords):
-        if all(map(self.check_coords, coords)):
-            self.x, self.y = (_ for _ in coords)
-        else:
-            raise IncorrectCoordinates(coords)
+        try:
+            if all(map(self.check_coords, coords)):
+                self.x, self.y = (_ for _ in coords)
+            else:
+                raise IncorrectCoordinates(coords)
+        except IncorrectCoordinates:
+            print(f'Incorrect ccordinates {coords}')
+
+    @staticmethod
+    def print_help():
+        print("x - is a horizontal coordinate, y - is a vertical coordinate")
 
 
 if __name__ == '__main__':
