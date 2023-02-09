@@ -20,24 +20,23 @@ class Board:
     def reduce_alive(self, name):
         self._alive_ships[name] -= 1
 
-    def add_ship(self, **kwargs):
-        if not 0 <= (course := kwargs['course']) <= 1:
+    def add_ship(self, *args):
+        ship_type, x, y, course = (_ for _ in args)
+        if not 0 <= course <= 1:
             raise CourseError(course)
-        dots_list = [dot for dots in self.board for dot in dots]
-        if kwargs['ship_type'] == 'boat':
+        if ship_type == 'boat':
             ship_type = Boat()
-        elif kwargs['ship_type'] == 'destroyer':
+        elif ship_type == 'destroyer':
             ship_type = Destroyer()
         else:
             ship_type = Cruiser()
-        ship_type.dots = kwargs['x'], kwargs['y'], course
-        for index, dot in enumerate(dots_list):
-            if dot in ship_type.dots:
-                if dot.state == 'empty':
-                    dot.state = 'ship'
-                else:
-                    raise IncorrectCoordinates(dot.coords)
-        self.contour(dots_list)
+        ship_type.dots = x, y, course
+        for dot in ship_type.dots:
+            x, y = (_ for _ in dot.coords)
+            if (state := self.board[y - 1][x - 1]).state == 'empty':
+                state.state = 'ship'
+            else:
+                raise IncorrectCoordinates(dot.coords)
         self.ships.append(ship_type)
 
     def contour(self, dots):
@@ -116,7 +115,6 @@ class Board:
         print("\n. - empty cell\n+ - a cell with the ship or a part of the ship"
               "\nF - a forbidden cell, there is no way to place ship in there, but you can try it )"
               "\n0 - miss marks as zero\nX - hit marks as X")
-
 
 
 if __name__ == '__main__':
