@@ -64,6 +64,7 @@ class Board:
 
     def show(self):
         if not self.hid:
+            print('\n')
             print(' ' * 6, end='')
             print(f"{' ' * 5}".join([str(_) for _ in range(1, self.board_size + 1)]))
             print(' ' * 3, end='')

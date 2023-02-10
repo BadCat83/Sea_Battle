@@ -87,10 +87,12 @@ class Ai(Player):
 
     def add_ship(self, ship_type):
         tries = 0
-        print(f"Trying to place {ship_type}")
+        print(f"\nTrying to place {ship_type}", end='')
         while True:
             tries += 1
-            if tries > 10000:
+            if tries % 100 == 0:
+                print("\nI'm still calculating", end='')
+            elif tries > 10000:
                 raise TryException
             try:
                 self.own_board.add_ship(ship_type, *(map(self.generate_number,
@@ -107,13 +109,10 @@ class Ai(Player):
         while True:
             try:
                 self.add_ship('cruser')
-                self.own_board.show()
                 for _ in range(2):
                     self.add_ship('destroyer')
-                    self.own_board.show()
                 for _ in range(4):
                     self.add_ship('boat')
-                    self.own_board.show()
             except TryException:
                 print("\nI'm still calculating )", end='')
                 self.own_board.reinitialize_board()
