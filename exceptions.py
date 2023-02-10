@@ -10,6 +10,11 @@ class IncorrectCoordinates(Exception):
     def __str__(self):
         return f'{self.message} are incorrect coordinates!'
 
+class TryException(Exception):
+
+    def __str__(self):
+        return "Too many attempts to place the ship"
+
 
 class ShotError(Exception):
 

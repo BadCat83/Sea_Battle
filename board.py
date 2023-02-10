@@ -14,6 +14,10 @@ class Board:
         self.hid = False
         self._alive_ships = {'cruiser': 1, 'destroyer': 2, 'boat': 4}
 
+    def reinitialize_board(self):
+        self.__init__()
+
+
     def get_alive(self, name):
         return self._alive_ships[name]
 
@@ -31,15 +35,19 @@ class Board:
         else:
             ship_type = Cruiser()
         ship_type.dots = x, y, course
+        temp_dots = []
         for dot in ship_type.dots:
             x, y = (_ for _ in dot.coords)
-            if (state := self.board[y - 1][x - 1]).state == 'empty':
-                state.state = 'ship'
+            if (target_dot := self.board[y - 1][x - 1]).state == 'empty':
+                temp_dots.append(target_dot)
             else:
                 raise IncorrectCoordinates(dot.coords)
+        for dot in temp_dots:
+            dot.state = 'ship'
         self.ships.append(ship_type)
+        self.contour()
 
-    def contour(self, dots):
+    def contour(self):
         for i, dots_list in enumerate(self.board):
             for j, dot in enumerate(dots_list):
                 if dot.state == 'ship':
@@ -57,7 +65,7 @@ class Board:
     def show(self):
         if not self.hid:
             print(' ' * 6, end='')
-            print(f"{' ' * 5}".join([str(_) for _ in range(1, self._board_size + 1)]))
+            print(f"{' ' * 5}".join([str(_) for _ in range(1, self.board_size + 1)]))
             print(' ' * 3, end='')
             print('-' * 37)
             for index, y_coord in enumerate(self.board, 1):
@@ -78,7 +86,8 @@ class Board:
                 print(' ' * 3, end='')
                 print('-' * 37)
 
-    def out(self, x, y):
+    @staticmethod
+    def out(x, y):
         if not all(map(Dot.check_coords, (x, y))):
             raise IncorrectCoordinates((x, y))
         return True
@@ -115,6 +124,10 @@ class Board:
         print("\n. - empty cell\n+ - a cell with the ship or a part of the ship"
               "\nF - a forbidden cell, there is no way to place ship in there, but you can try it )"
               "\n0 - miss marks as zero\nX - hit marks as X")
+
+    @property
+    def board_size(self):
+        return self._board_size
 
 
 if __name__ == '__main__':
