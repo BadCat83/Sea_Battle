@@ -15,18 +15,24 @@ class Ship:
         self.hit_points = None
         self.name = None
 
+    def __eq__(self, other_ship):
+        if not isinstance(other_ship, Ship):
+            raise TypeError("Right operand must be Ship class!")
+        if self._dots == other_ship._dots:
+            return True
+        return False
+
     def get_name(self):
         return self.name
 
-    def get_hit_points(self):
-        return self.hit_points
-
     def decrease_hit_points(self):
         self.hit_points -= 1
+        return self.hit_points
 
     @staticmethod
     def print_help():
-        print(f"A ship is positioned from starting coordinates from up to down or from left to right, depending on course.")
+        print(
+            f"A ship is positioned from starting coordinates from up to down or from left to right, depending on course.")
 
     def print_length_help(self):
         print(f"The {self.get_name()}'s length is {self.hit_points}. ", end='')
@@ -53,11 +59,11 @@ class Boat(Ship):
         self.name = 'boat'
 
 
-
 class Destroyer(Ship):
     def __init__(self):
         self.length = self.hit_points = 2
         self.name = 'destroyer'
+
 
 class Cruiser(Ship):
     def __init__(self):

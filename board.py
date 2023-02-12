@@ -22,13 +22,6 @@ class Board:
             if dot in ship.dots:
                 return ship
 
-    # def decrease_alive(self, name):
-    #     self._alive_ships[name] -= 1
-    #     return self._alive_ships[name]
-
-    # def reduce_alive(self, name):
-    #     self._alive_ships[name] -= 1
-
     def add_ship(self, *args):
         ship_type, x, y, course = args
         if not 0 <= course <= 1:
@@ -51,6 +44,7 @@ class Board:
             dot.state = 'ship'
         self.ships.append(ship_type)
         self.contour(self.ships[-1])
+
 
     def contour(self, ship):
         for dot in ship.dots:
