@@ -142,7 +142,7 @@ class Ai(Player):
             ai_dot.state = target_dot.state = 'hit'
             ship = enemy_board.get_ship(random_dot)
             if not ship.decrease_hit_points():
-                player.own_board.ships.remove(ship)
+                enemy_board.ships.remove(ship)
                 self.next_shots.clear()
                 self.last_hit = None
                 self.opponent_board.contour(ship)
