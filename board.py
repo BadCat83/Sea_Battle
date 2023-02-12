@@ -12,20 +12,25 @@ class Board:
         self.board = [[Dot(x, y) for x in range(1, self._board_size + 1)] for y in range(1, self._board_size + 1)]
         self.ships = []
         self.hid = False
-        self._alive_ships = {'cruiser': 1, 'destroyer': 2, 'boat': 4}
+        #self._alive_ships = {'cruiser': 1, 'destroyer': 2, 'boat': 4}
 
     def reinitialize_board(self):
         self.__init__()
 
+    def get_ship(self, dot):
+        for ship in self.ships:
+            if dot in ship.dots:
+                return ship
 
-    def get_alive(self, name):
-        return self._alive_ships[name]
+    # def decrease_alive(self, name):
+    #     self._alive_ships[name] -= 1
+    #     return self._alive_ships[name]
 
-    def reduce_alive(self, name):
-        self._alive_ships[name] -= 1
+    # def reduce_alive(self, name):
+    #     self._alive_ships[name] -= 1
 
     def add_ship(self, *args):
-        ship_type, x, y, course = (_ for _ in args)
+        ship_type, x, y, course = args
         if not 0 <= course <= 1:
             raise CourseError(course)
         if ship_type == 'boat':
@@ -45,26 +50,25 @@ class Board:
         for dot in temp_dots:
             dot.state = 'ship'
         self.ships.append(ship_type)
-        self.contour()
+        self.contour(self.ships[-1])
 
-    def contour(self):
-        for i, dots_list in enumerate(self.board):
-            for j, dot in enumerate(dots_list):
-                if dot.state == 'ship':
-                    dots_index = [(i - 1, j - 1), (i - 1, j),
-                                  (i - 1, j + 1), (i, j - 1),
-                                  (i, j + 1), (i + 1, j - 1),
-                                  (i + 1, j), (i + 1, j + 1)]
-                    for val in dots_index.copy():
-                        if not 0 <= val[0] < 6 or not 0 <= val[1] < 6:
-                            dots_index.remove(val)
-                    for index in dots_index:
-                        if self.board[index[0]][index[1]].state == 'empty':
-                            self.board[index[0]][index[1]].state = 'forbidden'
+    def contour(self, ship):
+        for dot in ship.dots:
+            x, y = map(lambda v: v-1, dot.coords)
+            dots_index = [(x, y-1), (x+1, y-1),
+                          (x+1, y), (x+1, y+1),
+                          (x, y+1), (x-1, y+1),
+                          (x-1, y), (x-1, y-1,)]
+            for val in dots_index.copy():
+                if not 0 <= val[0] < 6 or not 0 <= val[1] < 6:
+                    dots_index.remove(val)
+            for index in dots_index:
+                if self.board[index[1]][index[0]].state == 'empty':
+                    self.board[index[1]][index[0]].state = 'forbidden'
 
     def show(self):
         if not self.hid:
-            print('\n')
+            print('\r\r')
             print(' ' * 6, end='')
             print(f"{' ' * 5}".join([str(_) for _ in range(1, self.board_size + 1)]))
             print(' ' * 3, end='')
@@ -101,11 +105,11 @@ class Board:
             if target_dot.coords == dot.coords:
                 if dot.state == 'ship':
                     dot.state = 'hit'
-                    for target_ship in self.ships:
+                    for target_ship in self.ships.copy():
                         if dot in ship.dots:
-                            target_ship.decrease_hit_points()
-                        if target_ship.get_hit_points() == 0:
-                            self.reduce_alive(target_ship.get_name())
+                            if not target_ship.decrease_hit_points():
+                                self.ships.remove(target_ship)
+                                #self.reduce_alive(target_ship.get_name())
                 elif dot.state == 'hit' or dot.state == 'miss':
                     raise ShotError
                 else:
