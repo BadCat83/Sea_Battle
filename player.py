@@ -7,6 +7,7 @@ from exceptions import ShotError, TryException, BoardOutException, IncorrectCoor
 
 
 class Player:
+    """It's a common class for both player and AI, with some common methods and fields"""
 
     def __init__(self):
         self.own_board = Board()
@@ -28,6 +29,7 @@ class Player:
             for dot in dots:
                 dot.state = 'empty' if dot.state == 'forbidden' else dot.state
 
+    # Makes a move for players, shows opponent board if filed hid=True.
     def move(self, board):
         self.opponent_board.show()
         return self.ask(board)
@@ -43,6 +45,7 @@ class User(Player):
         super().__init__()
         self.name = None
 
+    # Requests the player for choose coordinates for a shot. Checks this coordinates. Handles 'hit' or 'miss' logic
     def ask(self, enemy_board):
         while True:
             try:
@@ -68,13 +71,14 @@ class User(Player):
             except Exception as e:
                 print(e)
 
+    # Handles coordinates input
     @staticmethod
     def input_coords(msg):
         return [int(val) for val in input(msg).split(',')]
 
+    # Add the ship, if at one moment it turns like there is no way to place the ship raise TryException
     def add_ship(self, msg, ship_type):
-        lst = self.check_empty_dots(self.own_board.board)
-        if not lst:
+        if not self.check_empty_dots(self.own_board.board):
             raise TryException
         while True:
             try:
@@ -90,6 +94,7 @@ class User(Player):
             else:
                 break
 
+    # Requests player for add ships  if TryException is raised, reinitializes player's board
     def place_ships(self):
         while True:
             self.own_board.print_help()
@@ -112,15 +117,18 @@ class Ai(Player):
     def __init__(self):
         super().__init__()
         # self.possible_shots = self.opponent_board.board.copy()
+        # There are some field for choose next shot logic
         self.next_shots = []
         self.last_hit = None
 
+    # Generates random coordinates and course
     @staticmethod
     def generate_number(top):
         if top == 1:
             return randint(0, top)
         return randint(1, top)
 
+    # Method adding ship for AI. Some improvements are added fo visual effects :))
     def add_ship(self, ship_type):
         tries = 0
         print(f"\rTrying to place {ship_type}")
@@ -141,6 +149,7 @@ class Ai(Player):
             else:
                 break
 
+    # Method for placing AI ships.
     def place_ships(self):
         print('Calculating... ', end='')
         while True:
@@ -157,6 +166,10 @@ class Ai(Player):
                 print("\rI'm ready :)")
                 break
 
+    # Here is some mess. I tried to improve AI logic for more interesting game. It probably worked out.
+    # AI tries to predict coordinates for next shot. If the board is increased and ships length increased too,
+    # it must work fine either. That's why I didn't use shot method in board class.
+    # Not much in common in these two methods.
     def ask(self, enemy_board):
         print("Skynet launches the rocket", end='')
         for _ in range(3):
@@ -193,6 +206,7 @@ class Ai(Player):
             sleep(2)
             return False
 
+    # Makes a list of the next shots
     def fill_next_shots(self, dot):
         x, y = (val - 1 for val in dot.coords)
         if self.last_hit:

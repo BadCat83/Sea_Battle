@@ -2,12 +2,14 @@ from player import *
 
 
 class Game:
+    """Game class manages the game, user makes firs move"""
     user = User()
     ai = Ai()
     user_board = user.own_board
     ai_board = ai.own_board
     ai_board.hid = True
 
+    # Greets the player, ask for introduce himself and place his ships. Calls place_ships method for AI
     def greet(self):
         print("Welcome to the sea battle game (shitcode version)")
         self.user.name = input("What's your name? ")
@@ -20,6 +22,7 @@ class Game:
         self.ai.opponent_board.hid = True
         print("Let the fight begin!")
 
+    # Manages the moves, checks the win
     def loop(self):
         turn = 0
         sequence = False

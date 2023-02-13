@@ -21,22 +21,26 @@ class Dot:
             return True
         return False
 
+    # Check if the coordinates are correct
     @staticmethod
     def check_coords(value):
         if 0 < value <= 6:
             return True
         return False
 
+    # Get dot state
     @property
     def state(self):
         for key, value in self._state.items():
             if value:
                 return key
 
+    # Get coordinates of the dot
     @property
     def coords(self):
         return self.x, self.y
 
+    # Set dot state
     @state.setter
     def state(self, changed_key):
         for key, value in self._state.items():
@@ -47,6 +51,7 @@ class Dot:
         if not any(self._state.values()):
             raise ValueError("Некорректное значение _state")
 
+    # Set coordinates to the dot
     @coords.setter
     def coords(self, coords):
         if all(map(self.check_coords, coords)):

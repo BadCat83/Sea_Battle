@@ -32,7 +32,8 @@ class Ship:
     @staticmethod
     def print_help():
         print(
-            f"A ship is positioned from starting coordinates from up to down or from left to right, depending on course.")
+            f"A ship is positioned from starting coordinates from up to down or from left to right,"
+            f" depending on course.")
 
     def print_length_help(self):
         print(f"The {self.get_name()}'s length is {self.hit_points}. ", end='')
@@ -55,18 +56,21 @@ class Ship:
 
 class Boat(Ship):
     def __init__(self):
+        super().__init__()
         self.length = self.hit_points = 1
         self.name = 'boat'
 
 
 class Destroyer(Ship):
     def __init__(self):
+        super().__init__()
         self.length = self.hit_points = 2
         self.name = 'destroyer'
 
 
 class Cruiser(Ship):
     def __init__(self):
+        super().__init__()
         self.length = self.hit_points = 3
         self.name = 'cruiser'
 

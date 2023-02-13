@@ -1,5 +1,3 @@
-from functools import reduce
-
 from exceptions import IncorrectCoordinates, ShotError, CourseError
 from ship import *
 
@@ -12,8 +10,9 @@ class Board:
         self.board = [[Dot(x, y) for x in range(1, self._board_size + 1)] for y in range(1, self._board_size + 1)]
         self.ships = []
         self.hid = False
-        #self._alive_ships = {'cruiser': 1, 'destroyer': 2, 'boat': 4}
+        # self._alive_ships = {'cruiser': 1, 'destroyer': 2, 'boat': 4}
 
+    # Resets the board
     def reinitialize_board(self):
         self.__init__()
 
@@ -22,6 +21,7 @@ class Board:
             if dot in ship.dots:
                 return ship
 
+    # Add ship depending on its type, check the course, coordinates.
     def add_ship(self, *args):
         ship_type, x, y, course = args
         if not 0 <= course <= 1:
@@ -45,14 +45,14 @@ class Board:
         self.ships.append(ship_type)
         self.contour(self.ships[-1])
 
-
+    # Outlining the ship
     def contour(self, ship):
         for dot in ship.dots:
-            x, y = map(lambda v: v-1, dot.coords)
-            dots_index = [(x, y-1), (x+1, y-1),
-                          (x+1, y), (x+1, y+1),
-                          (x, y+1), (x-1, y+1),
-                          (x-1, y), (x-1, y-1,)]
+            x, y = map(lambda v: v - 1, dot.coords)
+            dots_index = [(x, y - 1), (x + 1, y - 1),
+                          (x + 1, y), (x + 1, y + 1),
+                          (x, y + 1), (x - 1, y + 1),
+                          (x - 1, y), (x - 1, y - 1,)]
             for val in dots_index.copy():
                 if not 0 <= val[0] < 6 or not 0 <= val[1] < 6:
                     dots_index.remove(val)
@@ -60,6 +60,7 @@ class Board:
                 if self.board[index[1]][index[0]].state == 'empty':
                     self.board[index[1]][index[0]].state = 'forbidden'
 
+    # Drawing the board
     def show(self):
         if not self.hid:
             print('\r\r')
@@ -85,19 +86,21 @@ class Board:
                 print(' ' * 3, end='')
                 print('-' * 37)
 
+    # Checks weather the ship placed out of the board or not
     @staticmethod
     def out(x, y):
         if not all(map(Dot.check_coords, (x, y))):
             raise IncorrectCoordinates((x, y))
         return True
 
+    # Makes a shot for player. Shot for Ai logic in player.py. Maybe later I'll make a refactoring
     def shot(self, x, y, board):
         if not self.out(x, y):
             raise IncorrectCoordinates((x, y))
         own_state = board.board[y - 1][x - 1].state
         if own_state == "miss" or own_state == "forbidden":
             raise ShotError
-        if (target_dot := self.board[y-1][x-1]).state == 'ship':
+        if (target_dot := self.board[y - 1][x - 1]).state == 'ship':
             ship = self.get_ship(target_dot)
             if not ship.decrease_hit_points():
                 self.ships.remove(ship)
@@ -105,25 +108,9 @@ class Board:
             return True
         return False
 
-        # for dot in [dot for dots in self.board for dot in dots]:
-        #     if target_dot.coords == dot.coords:
-        #         if dot.state == 'ship':
-        #             dot.state = 'hit'
-        #             for target_ship in self.ships.copy():
-        #                 if dot in ship.dots:
-        #                     if not target_ship.decrease_hit_points():
-        #                         self.ships.remove(target_ship)
-        #                         #self.reduce_alive(target_ship.get_name())
-        #         elif dot.state == 'hit' or dot.state == 'miss':
-        #             raise ShotError
-        #         else:
-        #             dot.state = 'miss'
-        #         break
-
     @staticmethod
     def print_help():
-        tmp = Board()
-        tmp.show()
+        Board().show()
         print(f"This is your board. You need to place ships on it."
               f" You have got a cruiser, two destroyers and four boats")
         Ship().print_help()
