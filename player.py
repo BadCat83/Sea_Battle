@@ -18,9 +18,19 @@ class Player:
     def ask(self, board):
         pass
 
+    # Return the list with empty dots
+    @staticmethod
+    def check_empty_dots(board):
+        return [dot for dots in board for dot in dots if dot.state == 'empty']
+
+    def clean_board(self):
+        for dots in self.own_board.board:
+            for dot in dots:
+                dot.state = 'empty' if dot.state == 'forbidden' else dot.state
+
     def move(self, board):
         self.opponent_board.show()
-        self.ask(board)
+        return self.ask(board)
 
     @staticmethod
     def print_help_coordinates():
@@ -29,31 +39,43 @@ class Player:
 
 class User(Player):
 
+    def __init__(self):
+        super().__init__()
+        self.name = None
+
     def ask(self, enemy_board):
         while True:
             try:
                 x, y = [int(val) for val in input("Where do you want to shoot?"
                                                   " Please, input two coordinates separated by comma: "
                                                   "x - horizontal, y - vertical: ").split(',')]
-                for every in self.own_board, self.opponent_board:
-                    every.shot(x, y)
+                if enemy_board.shot(x, y, self.opponent_board):
+                    self.opponent_board.board[y - 1][x - 1].state = enemy_board.board[y - 1][x - 1].state = 'hit'
+                    print("Hit!")
+                    return True
+                else:
+                    self.opponent_board.board[y - 1][x - 1].state = enemy_board.board[y - 1][x - 1].state = 'miss'
+                    print("Miss!\nSkynet board:")
+                    self.opponent_board.show()
+                    return False
 
             except ShotError as se:
                 print(se)
                 continue
-
-            except Exception as e:
-                print(e)
+            except IncorrectCoordinates:
                 Player().print_help_coordinates()
                 continue
-            else:
-                break
+            except Exception as e:
+                print(e)
 
     @staticmethod
     def input_coords(msg):
         return [int(val) for val in input(msg).split(',')]
 
     def add_ship(self, msg, ship_type):
+        lst = self.check_empty_dots(self.own_board.board)
+        if not lst:
+            raise TryException
         while True:
             try:
                 if not ship_type == "boat":
@@ -69,13 +91,20 @@ class User(Player):
                 break
 
     def place_ships(self):
-        self.own_board.print_help()
-        print("For every ship you need to enter starting position (x,y) and course 0 - vertical, 1 - horizontal")
-        self.add_ship("Please, place the cruiser first (x,y,course): ", 'cruiser')
-        for i, _ in enumerate(range(2), 1):
-            self.add_ship(f"Please, place {i} destroyer (x,y,course): ", 'destroyer')
-        for i, _ in enumerate(range(4), 1):
-            self.add_ship(f"Please, place {i} boat (x,y): ", 'boat')
+        while True:
+            self.own_board.print_help()
+            print("For every ship you need to enter starting position (x,y) and course 0 - vertical, 1 - horizontal")
+            try:
+                self.add_ship("Please, place the cruiser first (x,y,course): ", 'cruiser')
+                for i, _ in enumerate(range(2), 1):
+                    self.add_ship(f"Please, place {i} destroyer (x,y,course): ", 'destroyer')
+                for i, _ in enumerate(range(4), 1):
+                    self.add_ship(f"Please, place {i} boat (x,y): ", 'boat')
+                break
+            except TryException:
+                print("You have no space for place another one ship. Try again!")
+                self.own_board.reinitialize_board()
+                sleep(2)
 
 
 class Ai(Player):
@@ -129,7 +158,11 @@ class Ai(Player):
                 break
 
     def ask(self, enemy_board):
-        possible_shots = [dot for dots in self.opponent_board.board for dot in dots if dot.state == 'empty']
+        print("Skynet launches the rocket", end='')
+        for _ in range(3):
+            sleep(0.5)
+            print('.', end='')
+        possible_shots = self.check_empty_dots(self.opponent_board.board)
         if not self.next_shots:
             random_dot = random.choice([_ for _ in possible_shots if _])
         else:
@@ -149,11 +182,15 @@ class Ai(Player):
             else:
                 self.fill_next_shots(target_dot)
                 self.last_hit = target_dot
-            # self.possible_shots[random_dot.coords[1] - 1].remove(random_dot)
+            print('hit')
+            enemy_board.show()
+            sleep(2)
             return True
         else:
             ai_dot.state = target_dot.state = 'miss'
-            # self.possible_shots[random_dot.coords[1] - 1].remove(random_dot)
+            print('miss')
+            enemy_board.show()
+            sleep(2)
             return False
 
     def fill_next_shots(self, dot):

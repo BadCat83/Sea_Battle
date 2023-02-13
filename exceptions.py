@@ -19,7 +19,7 @@ class TryException(Exception):
 class ShotError(Exception):
 
     def __str__(self):
-        return 'You has already shot to this position'
+        return 'You has already shot to this position or there is no sense to shot there'
 
 
 class CourseError(Exception):

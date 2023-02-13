@@ -91,24 +91,34 @@ class Board:
             raise IncorrectCoordinates((x, y))
         return True
 
-    def shot(self, x, y):
+    def shot(self, x, y, board):
         if not self.out(x, y):
             raise IncorrectCoordinates((x, y))
-        target_dot = Dot(x, y)
-        for dot in [dot for dots in self.board for dot in dots]:
-            if target_dot.coords == dot.coords:
-                if dot.state == 'ship':
-                    dot.state = 'hit'
-                    for target_ship in self.ships.copy():
-                        if dot in ship.dots:
-                            if not target_ship.decrease_hit_points():
-                                self.ships.remove(target_ship)
-                                #self.reduce_alive(target_ship.get_name())
-                elif dot.state == 'hit' or dot.state == 'miss':
-                    raise ShotError
-                else:
-                    dot.state = 'miss'
-                break
+        own_state = board.board[y - 1][x - 1].state
+        if own_state == "miss" or own_state == "forbidden":
+            raise ShotError
+        if (target_dot := self.board[y-1][x-1]).state == 'ship':
+            ship = self.get_ship(target_dot)
+            if not ship.decrease_hit_points():
+                self.ships.remove(ship)
+                board.contour(ship)
+            return True
+        return False
+
+        # for dot in [dot for dots in self.board for dot in dots]:
+        #     if target_dot.coords == dot.coords:
+        #         if dot.state == 'ship':
+        #             dot.state = 'hit'
+        #             for target_ship in self.ships.copy():
+        #                 if dot in ship.dots:
+        #                     if not target_ship.decrease_hit_points():
+        #                         self.ships.remove(target_ship)
+        #                         #self.reduce_alive(target_ship.get_name())
+        #         elif dot.state == 'hit' or dot.state == 'miss':
+        #             raise ShotError
+        #         else:
+        #             dot.state = 'miss'
+        #         break
 
     @staticmethod
     def print_help():
