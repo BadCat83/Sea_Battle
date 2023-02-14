@@ -41,7 +41,7 @@ class Game:
                       f" it took {turn} turns to beat Skynet")
                 break
             elif not self.user.own_board.ships:
-                print(f"The Earth is doomed, Skynet has just kicked your ass. It takes {turn} turns")
+                print(f"The Earth is doomed, Skynet has just kicked your ass. It takes {turn/2} turns")
                 break
             else:
                 continue

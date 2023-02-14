@@ -101,9 +101,11 @@ class Board:
         if own_state == "miss" or own_state == "forbidden":
             raise ShotError
         if (target_dot := self.board[y - 1][x - 1]).state == 'ship':
+            print("Hit!")
             ship = self.get_ship(target_dot)
             if not ship.decrease_hit_points():
                 self.ships.remove(ship)
+                print(f"The {ship.get_name()} is destroyed")
                 board.contour(ship)
             return True
         return False

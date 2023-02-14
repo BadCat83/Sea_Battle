@@ -54,7 +54,6 @@ class User(Player):
                                                   "x - horizontal, y - vertical: ").split(',')]
                 if enemy_board.shot(x, y, self.opponent_board):
                     self.opponent_board.board[y - 1][x - 1].state = enemy_board.board[y - 1][x - 1].state = 'hit'
-                    print("Hit!")
                     return True
                 else:
                     self.opponent_board.board[y - 1][x - 1].state = enemy_board.board[y - 1][x - 1].state = 'miss'
@@ -185,17 +184,18 @@ class Ai(Player):
         target_dot = enemy_board.board[y - 1][x - 1]
         ai_dot = self.opponent_board.board[y - 1][x - 1]
         if target_dot.state == 'ship':
+            print('hit')
             ai_dot.state = target_dot.state = 'hit'
             ship = enemy_board.get_ship(random_dot)
             if not ship.decrease_hit_points():
                 enemy_board.ships.remove(ship)
+                print(f"The {ship.get_name()} is destroyed")
                 self.next_shots.clear()
                 self.last_hit = None
                 self.opponent_board.contour(ship)
             else:
                 self.fill_next_shots(target_dot)
                 self.last_hit = target_dot
-            print('hit')
             enemy_board.show()
             sleep(2)
             return True
